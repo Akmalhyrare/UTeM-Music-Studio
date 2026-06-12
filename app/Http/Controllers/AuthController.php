@@ -25,9 +25,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Check staff table first
-        $staff = Staff::where('email', $request->email)->first();
+        // Only active accounts can log in (AUTH-1 fix)
+        $staff = Staff::where('email', $request->email)->where('status', 'active')->first();
         if ($staff && Hash::check($request->password, $staff->password)) {
+            Session::regenerate(); // prevent session fixation (CSRF-2 fix)
             Session::put('user_id',   $staff->staff_id);
             Session::put('user_name', $staff->full_name);
             Session::put('user_role', $staff->is_admin ? 'admin' : 'staff');
@@ -36,9 +37,9 @@ class AuthController extends Controller
             return redirect()->route('staff.dashboard');
         }
 
-        // Check student table
-        $student = Student::where('email', $request->email)->first();
+        $student = Student::where('email', $request->email)->where('status', 'active')->first();
         if ($student && Hash::check($request->password, $student->password)) {
+            Session::regenerate(); // prevent session fixation (CSRF-2 fix)
             Session::put('user_id',   $student->student_id);
             Session::put('user_name', $student->full_name);
             Session::put('user_role', 'student');
@@ -46,7 +47,9 @@ class AuthController extends Controller
             return redirect()->route('student.dashboard');
         }
 
-        // If no match
+        // Run a dummy hash so response time does not reveal whether the email exists
+        Hash::check($request->password, '$2y$12$invalidhashusedtoblindtimingoracle00000000000000000000u');
+
         return back()->withErrors([
             'email' => 'Invalid email or password.',
         ]);
@@ -55,36 +58,39 @@ class AuthController extends Controller
     // Logout
     public function logout()
     {
-        Session::flush();
+        // Destroy the session entirely and rotate the CSRF token (CSRF-1 fix)
+        Session::invalidate();
+        Session::regenerateToken();
         return redirect()->route('login');
     }
+
     // Show register page
-public function showRegister()
-{
-    return view('auth.register');
-}
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
 
-// Handle student registration
-public function register(Request $request)
-{
-    $request->validate([
-        'full_name' => 'required|string|max:100',
-        'email'     => 'required|email|unique:students,email',
-        'matric_no' => 'required|string|max:20|unique:students,matric_no',
-        'phone_no'  => 'nullable|string|max:20',
-        'password'  => 'required|min:6|confirmed',
-    ]);
+    // Handle student registration
+    public function register(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:100',
+            'email'     => 'required|email|unique:students,email',
+            'matric_no' => 'required|string|max:20|unique:students,matric_no',
+            'phone_no'  => 'nullable|string|max:20',
+            'password'  => 'required|min:6|confirmed',
+        ]);
 
-    Student::create([
-        'full_name' => $request->full_name,
-        'email'     => $request->email,
-        'matric_no' => $request->matric_no,
-        'phone_no'  => $request->phone_no,
-        'password'  => Hash::make($request->password),
-        'status'    => 'active',
-    ]);
+        Student::create([
+            'full_name' => $request->full_name,
+            'email'     => $request->email,
+            'matric_no' => $request->matric_no,
+            'phone_no'  => $request->phone_no,
+            'password'  => Hash::make($request->password),
+            'status'    => 'active',
+        ]);
 
-    return redirect()->route('login')
-                     ->with('success', 'Account created! Please login.');
-}
+        return redirect()->route('login')
+                         ->with('success', 'Account created! Please login.');
+    }
 }
