@@ -9,46 +9,29 @@ use App\Models\Category;
 
 class InventoryController extends Controller
 {
-    // Check if staff is logged in
-    private function checkStaff()
-    {
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-        return null;
-    }
-
-    // Show all items
     public function index(Request $request)
     {
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-
         $query = Item::with('category');
 
-        // Search
         if ($request->search) {
             $query->where('item_name', 'like', '%' . $request->search . '%');
         }
 
-        // Filter by category type
         if ($request->type) {
-            $query->whereHas('category', function($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request) {
                 $q->where('type', $request->type);
             });
         }
 
-        // Filter by status
         if ($request->status) {
             $query->where('item_status', $request->status);
         }
 
-        $items         = $query->orderBy('item_id', 'desc')->get();
-        $totalEquipment = Item::whereHas('category', fn($q) => $q->where('type', 'equipment'))->count();
-        $totalAttire   = Item::whereHas('category', fn($q) => $q->where('type', 'attire'))->count();
-        $lowStock      = Item::whereRaw('available_quantity <= quantity * 0.3')->count();
-        $totalItems    = Item::count();
+        $items          = $query->orderBy('item_id', 'desc')->get();
+        $totalEquipment = Item::whereHas('category', fn ($q) => $q->where('type', 'equipment'))->count();
+        $totalAttire    = Item::whereHas('category', fn ($q) => $q->where('type', 'attire'))->count();
+        $lowStock       = Item::whereRaw('available_quantity <= quantity * 0.3')->count();
+        $totalItems     = Item::count();
 
         return view('inventory.index', compact(
             'items',
@@ -59,26 +42,20 @@ class InventoryController extends Controller
         ));
     }
 
-    // Show create form
     public function create()
     {
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-
         $categories = Category::orderBy('type')->get();
         return view('inventory.create', compact('categories'));
     }
 
-    // Store new item
     public function store(Request $request)
     {
         $request->validate([
             'category_id'      => 'required',
             'item_name'        => 'required|string|max:100',
             'quantity'         => 'required|integer|min:1',
-            'condition_status' => 'required',
-            'item_status'      => 'required',
+            'condition_status' => 'required|in:good,fair,poor',
+            'item_status'      => 'required|in:available,unavailable',
             'image'            => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
         ]);
 
@@ -100,31 +77,26 @@ class InventoryController extends Controller
         ]);
 
         return redirect()->route('inventory.index')
-                        ->with('success', 'Item added successfully!');
+                         ->with('success', 'Item added successfully!');
     }
 
-    // Show edit form
     public function edit($id)
     {
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-
         $item       = Item::findOrFail($id);
         $categories = Category::orderBy('type')->get();
         return view('inventory.edit', compact('item', 'categories'));
     }
 
-    // Update item
     public function update(Request $request, $id)
     {
         $request->validate([
-            'category_id'      => 'required',
-            'item_name'        => 'required|string|max:100',
-            'quantity'         => 'required|integer|min:1',
-            'condition_status' => 'required',
-            'item_status'      => 'required',
-            'image'            => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+            'category_id'        => 'required',
+            'item_name'          => 'required|string|max:100',
+            'quantity'           => 'required|integer|min:1',
+            'available_quantity' => 'required|integer|min:0|lte:quantity',
+            'condition_status'   => 'required|in:good,fair,poor',
+            'item_status'        => 'required|in:available,unavailable',
+            'image'              => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
         ]);
 
         $item = Item::findOrFail($id);
@@ -141,39 +113,37 @@ class InventoryController extends Controller
             'category_id'        => $request->category_id,
             'item_name'          => $request->item_name,
             'item_description'   => $request->item_description,
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',            
+            'image'              => $imagePath,
             'quantity'           => $request->quantity,
-            'available_quantity' => $request->available_quantity ?? $item->available_quantity,
+            'available_quantity' => $request->available_quantity,
             'condition_status'   => $request->condition_status,
             'item_status'        => $request->item_status,
         ]);
 
         return redirect()->route('inventory.index')
-                        ->with('success', 'Item updated successfully!');
+                         ->with('success', 'Item updated successfully!');
     }
 
-    // Delete item
     public function destroy($id)
     {
         $item = Item::findOrFail($id);
+
+        if ($item->image) {
+            Storage::disk('public')->delete($item->image);
+        }
+
         $item->delete();
 
         return redirect()->route('inventory.index')
                          ->with('success', 'Item deleted successfully!');
     }
 
-    // Show categories page
     public function categories()
     {
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-
         $categories = Category::withCount('items')->get();
         return view('inventory.categories', compact('categories'));
     }
 
-    // Store new category
     public function storeCategory(Request $request)
     {
         $request->validate([
@@ -192,12 +162,10 @@ class InventoryController extends Controller
                          ->with('success', 'Category added successfully!');
     }
 
-    // Delete category
     public function destroyCategory($id)
     {
         $category = Category::findOrFail($id);
 
-        // Check if category has items
         if ($category->items()->count() > 0) {
             return redirect()->route('inventory.categories')
                              ->with('error', 'Cannot delete category — it has items attached!');
@@ -208,18 +176,15 @@ class InventoryController extends Controller
                          ->with('success', 'Category deleted successfully!');
     }
 
-    // Compress and save image
     private function uploadAndCompress($file)
     {
         $filename = time() . '_' . uniqid() . '.jpg';
         $folder   = storage_path('app/public/items');
 
-        // Make sure folder exists
         if (!file_exists($folder)) {
             mkdir($folder, 0755, true);
         }
 
-        // Try GD compression if available
         if (extension_loaded('gd')) {
             $savePath  = $folder . '/' . $filename;
             $imageInfo = getimagesize($file->getRealPath());
@@ -236,15 +201,11 @@ class InventoryController extends Controller
             $origWidth  = imagesx($source);
             $origHeight = imagesy($source);
             $maxWidth   = 800;
+            $maxHeight  = 800;
 
-            if ($origWidth > $maxWidth) {
-                $ratio     = $maxWidth / $origWidth;
-                $newWidth  = $maxWidth;
-                $newHeight = (int)($origHeight * $ratio);
-            } else {
-                $newWidth  = $origWidth;
-                $newHeight = $origHeight;
-            }
+            $ratio = min($maxWidth / $origWidth, $maxHeight / $origHeight, 1);
+            $newWidth  = (int) ($origWidth  * $ratio);
+            $newHeight = (int) ($origHeight * $ratio);
 
             $resized = imagecreatetruecolor($newWidth, $newHeight);
 
@@ -263,7 +224,6 @@ class InventoryController extends Controller
             return 'items/' . $filename;
         }
 
-        // GD not available — just store original file
         return $file->store('items', 'public');
     }
 }

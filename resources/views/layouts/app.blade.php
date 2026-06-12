@@ -126,7 +126,7 @@
             📊 Dashboard
         </a>
 
-        @if(session('user_type') === 'staff')
+        @if(session('user_type') === 'staff' && session('is_admin'))
         <a href="{{ route('users.index') }}"
         class="nav-link {{ request()->routeIs('users*') ? 'active' : '' }}">
             👥 Users

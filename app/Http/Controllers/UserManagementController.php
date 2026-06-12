@@ -9,22 +9,8 @@ use App\Models\Student;
 
 class UserManagementController extends Controller
 {
-    // Check if admin
-    private function checkAdmin()
-    {
-        if (session('user_type') !== 'staff' || !session('is_admin')) {
-            return redirect()->route('login');
-        }
-        return null;
-    }
-
-    // Show all users
     public function index()
     {
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-
         $staffList   = Staff::orderBy('staff_id', 'desc')->get();
         $studentList = Student::orderBy('student_id', 'desc')->get();
 

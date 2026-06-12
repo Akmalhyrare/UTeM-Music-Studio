@@ -11,11 +11,6 @@ class StaffController extends Controller
 {
     public function dashboard()
     {
-        // Check if staff is logged in
-        if (session('user_type') !== 'staff') {
-            return redirect()->route('login');
-        }
-
         $totalEquipment  = Item::whereHas('category', fn($q) => $q->where('type', 'equipment'))->count();
         $totalAttire     = Item::whereHas('category', fn($q) => $q->where('type', 'attire'))->count();
         $pendingBorrows  = Borrowing::where('borrow_status', 'pending')->count();
