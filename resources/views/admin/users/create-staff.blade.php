@@ -43,6 +43,8 @@
                        style="font-size:13px;"
                        placeholder="Enter email address"
                        value="{{ old('email') }}"
+                       pattern="[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}"
+                       title="Please enter a valid email address with a domain extension (e.g. .com, .edu.my)."
                        required>
             </div>
 
@@ -72,8 +74,11 @@
                        name="password"
                        class="form-control"
                        style="font-size:13px;"
-                       placeholder="Minimum 6 characters"
+                       placeholder="Minimum 8 characters"
                        required>
+                <small class="text-muted" style="font-size:12px;">
+                    Minimum 8 characters, including an uppercase letter, a lowercase letter, a number and a special character.
+                </small>
             </div>
 
             <div class="mb-3">
@@ -100,7 +105,7 @@
             <div class="d-flex gap-2">
                 <button type="submit"
                         class="btn"
-                        style="background:#1D9E75;color:#fff;font-size:13px;border-radius:8px;">
+                        style="background:#7C3AED;color:#fff;font-size:13px;border-radius:8px;">
                     ✅ Save Staff Account
                 </button>
                 <a href="{{ route('users.index') }}"

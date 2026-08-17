@@ -3,19 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Item;
 use App\Models\Category;
+use App\Services\ItemImageService;
+use App\Support\Search;
 
 class InventoryController extends Controller
 {
+    public function __construct(private ItemImageService $itemImageService)
+    {
+    }
+
     public function index(Request $request)
     {
         $query = Item::with('category');
 
-        if ($request->search) {
-            $query->where('item_name', 'like', '%' . $request->search . '%');
-        }
+        Search::apply($query, $request->search, Item::searchableColumns(), [
+            'category' => ['category_name'],
+        ]);
 
         if ($request->type) {
             $query->whereHas('category', function ($q) use ($request) {
@@ -27,10 +32,14 @@ class InventoryController extends Controller
             $query->where('item_status', $request->status);
         }
 
-        $items          = $query->orderBy('item_id', 'desc')->get();
+        $items          = $query->orderBy('item_id', 'desc')->paginate(15)->withQueryString();
         $totalEquipment = Item::whereHas('category', fn ($q) => $q->where('type', 'equipment'))->count();
         $totalAttire    = Item::whereHas('category', fn ($q) => $q->where('type', 'attire'))->count();
-        $lowStock       = Item::whereRaw('available_quantity <= quantity * 0.3')->count();
+        // Threshold matches the v_inventory_low_stock view and ReportController::inventoryReport().
+        $lowStock       = Item::where('item_status', 'available')
+            ->where('quantity', '>', 0)
+            ->whereRaw('available_quantity <= quantity * 0.2')
+            ->count();
         $totalItems     = Item::count();
 
         return view('inventory.index', compact(
@@ -61,7 +70,7 @@ class InventoryController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $this->uploadAndCompress($request->file('image'));
+            $imagePath = $this->itemImageService->uploadAndCompress($request->file('image'));
         }
 
         Item::create([
@@ -104,9 +113,9 @@ class InventoryController extends Controller
         $imagePath = $item->image;
         if ($request->hasFile('image')) {
             if ($item->image) {
-                Storage::disk('public')->delete($item->image);
+                $this->itemImageService->deleteStoredFile($item->image);
             }
-            $imagePath = $this->uploadAndCompress($request->file('image'));
+            $imagePath = $this->itemImageService->uploadAndCompress($request->file('image'));
         }
 
         $item->update([
@@ -128,8 +137,23 @@ class InventoryController extends Controller
     {
         $item = Item::findOrFail($id);
 
+        $hasHistory = $item->borrowingDetails()->exists()
+            || $item->returnRecords()->exists()
+            || $item->maintenances()->exists();
+
+        if ($hasHistory) {
+            $item->update(['item_status' => 'unavailable']);
+
+            return redirect()->route('inventory.index')
+                             ->with('success', 'Item has borrowing/maintenance history, so it was marked Unavailable instead of deleted.');
+        }
+
         if ($item->image) {
-            Storage::disk('public')->delete($item->image);
+            $this->itemImageService->deleteStoredFile($item->image);
+        }
+
+        foreach ($item->images as $image) {
+            $this->itemImageService->deleteStoredFile($image->image_path);
         }
 
         $item->delete();
@@ -174,56 +198,5 @@ class InventoryController extends Controller
         $category->delete();
         return redirect()->route('inventory.categories')
                          ->with('success', 'Category deleted successfully!');
-    }
-
-    private function uploadAndCompress($file)
-    {
-        $filename = time() . '_' . uniqid() . '.jpg';
-        $folder   = storage_path('app/public/items');
-
-        if (!file_exists($folder)) {
-            mkdir($folder, 0755, true);
-        }
-
-        if (extension_loaded('gd')) {
-            $savePath  = $folder . '/' . $filename;
-            $imageInfo = getimagesize($file->getRealPath());
-            $mime      = $imageInfo['mime'];
-
-            if ($mime === 'image/jpeg') {
-                $source = imagecreatefromjpeg($file->getRealPath());
-            } elseif ($mime === 'image/png') {
-                $source = imagecreatefrompng($file->getRealPath());
-            } else {
-                return $file->store('items', 'public');
-            }
-
-            $origWidth  = imagesx($source);
-            $origHeight = imagesy($source);
-            $maxWidth   = 800;
-            $maxHeight  = 800;
-
-            $ratio = min($maxWidth / $origWidth, $maxHeight / $origHeight, 1);
-            $newWidth  = (int) ($origWidth  * $ratio);
-            $newHeight = (int) ($origHeight * $ratio);
-
-            $resized = imagecreatetruecolor($newWidth, $newHeight);
-
-            if ($mime === 'image/png') {
-                imagealphablending($resized, false);
-                imagesavealpha($resized, true);
-                $transparent = imagecolorallocatealpha($resized, 255, 255, 255, 127);
-                imagefilledrectangle($resized, 0, 0, $newWidth, $newHeight, $transparent);
-            }
-
-            imagecopyresampled($resized, $source, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
-            imagejpeg($resized, $savePath, 75);
-            imagedestroy($source);
-            imagedestroy($resized);
-
-            return 'items/' . $filename;
-        }
-
-        return $file->store('items', 'public');
     }
 }

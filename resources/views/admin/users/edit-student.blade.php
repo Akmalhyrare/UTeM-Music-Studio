@@ -52,6 +52,8 @@
                        class="form-control"
                        style="font-size:13px;"
                        value="{{ old('email', $student->email) }}"
+                       pattern="[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}"
+                       title="Please enter a valid email address with a domain extension (e.g. .com, .edu.my)."
                        required>
             </div>
 
@@ -74,6 +76,9 @@
                        class="form-control"
                        style="font-size:13px;"
                        placeholder="Enter new password">
+                <small class="text-muted" style="font-size:12px;">
+                    If provided, minimum 8 characters, including an uppercase letter, a lowercase letter, a number and a special character.
+                </small>
             </div>
 
             <div class="mb-4">
@@ -87,7 +92,7 @@
             <div class="d-flex gap-2">
                 <button type="submit"
                         class="btn"
-                        style="background:#1D9E75;color:#fff;font-size:13px;border-radius:8px;">
+                        style="background:#7C3AED;color:#fff;font-size:13px;border-radius:8px;">
                     ✅ Update Student Account
                 </button>
                 <a href="{{ route('users.index') }}"

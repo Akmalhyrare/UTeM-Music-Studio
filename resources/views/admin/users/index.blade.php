@@ -21,11 +21,11 @@
 <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px;">
     <div class="card border-0 shadow-sm">
         <div class="card-body d-flex align-items-center gap-3">
-            <div class="p-2 rounded" style="background:#E1F5EE;">
+            <div class="p-2 rounded" style="background:#F3E8FF;">
                 <span style="font-size:20px;">👑</span>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">{{ $staffList->where('is_admin', true)->count() }}</h4>
+                <h4 class="mb-0 fw-bold">{{ $adminCount }}</h4>
                 <small class="text-muted">Admins</small>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 <span style="font-size:20px;">👷</span>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">{{ $staffList->count() }}</h4>
+                <h4 class="mb-0 fw-bold">{{ $staffTotal }}</h4>
                 <small class="text-muted">Staff accounts</small>
             </div>
         </div>
@@ -47,10 +47,32 @@
                 <span style="font-size:20px;">🎓</span>
             </div>
             <div>
-                <h4 class="mb-0 fw-bold">{{ $studentList->count() }}</h4>
+                <h4 class="mb-0 fw-bold">{{ $studentTotal }}</h4>
                 <small class="text-muted">Student accounts</small>
             </div>
         </div>
+    </div>
+</div>
+
+{{-- SEARCH --}}
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <form method="GET" action="{{ route('users.index') }}" data-instant-search>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       style="font-size:13px; max-width:300px;"
+                       placeholder="Search by name, email, matric no., position, phone..."
+                       value="{{ request('search') }}">
+                <button type="submit" class="btn btn-sm" style="background:#7C3AED;color:#fff;border-radius:8px;">
+                    🔍 Search
+                </button>
+                <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+                    Reset
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -60,7 +82,7 @@
         <span style="font-weight:600;">👷 Staff Accounts</span>
         <a href="{{ route('users.staff.create') }}"
            class="btn btn-sm"
-           style="background:#1D9E75;color:#fff;border-radius:8px;">
+           style="background:#7C3AED;color:#fff;border-radius:8px;">
             + Add Staff
         </a>
     </div>
@@ -86,31 +108,49 @@
                     <td>{{ $staff->position ?? '-' }}</td>
                     <td>
                         @if($staff->is_admin)
-                            <span class="badge" style="background:#E1F5EE;color:#085041;">Admin</span>
+                            <span class="badge" style="background:#F3E8FF;color:#5B21B6;">Admin</span>
                         @else
                             <span class="badge" style="background:#FAEEDA;color:#633806;">Staff</span>
                         @endif
                     </td>
                     <td>
                         @if($staff->status === 'active')
-                            <span class="badge" style="background:#E1F5EE;color:#085041;">Active</span>
+                            <span class="badge" style="background:#D1FAE5;color:#065F46;">Active</span>
                         @else
-                            <span class="badge" style="background:#FAECE7;color:#712B13;">Inactive</span>
+                            <span class="badge" style="background:#E5E7EB;color:#374151;">Inactive</span>
                         @endif
                     </td>
                     <td>
                         <a href="{{ route('users.staff.edit', $staff->staff_id) }}"
                            class="btn btn-sm btn-outline-secondary">✏️ Edit</a>
                     @if($staff->staff_id != session('user_id'))
-                        <form method="POST"
-                            action="{{ route('users.staff.destroy', $staff->staff_id) }}"
-                            style="display:inline;"
-                            onsubmit="return confirm('Delete this staff account?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="btn btn-sm btn-outline-danger">🗑️</button>
-                        </form>
+                        @if($staff->status === 'inactive')
+                            <span class="badge" style="background:#E5E7EB;color:#374151;" title="Reactivate via Edit by setting status to Active">
+                                📦 Archived
+                            </span>
+                        @elseif($staff->hasHistoricalRecords())
+                            <form method="POST"
+                                action="{{ route('users.staff.destroy', $staff->staff_id) }}"
+                                style="display:inline;"
+                                onsubmit="return confirm('This staff account has related records (approvals, bookings, maintenance, etc.). It will be archived (deactivated) instead of deleted so history is preserved. Continue?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-warning"
+                                        title="Archive User">📦 Archive User</button>
+                            </form>
+                        @else
+                            <form method="POST"
+                                action="{{ route('users.staff.destroy', $staff->staff_id) }}"
+                                style="display:inline;"
+                                onsubmit="return confirm('Delete this staff account? This action is permanent.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="Delete">🗑️</button>
+                            </form>
+                        @endif
                     @else
                         <button class="btn btn-sm btn-outline-secondary"
                                 disabled
@@ -123,13 +163,22 @@
                 @empty
                 <tr>
                     <td colspan="7" class="text-center text-muted py-3">
-                        No staff accounts found
+                        @if(request('search'))
+                            No staff accounts match "{{ request('search') }}"
+                        @else
+                            No staff accounts found
+                        @endif
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @if($staffList->hasPages())
+        <div class="card-footer bg-white">
+            {{ $staffList->links('pagination::bootstrap-5') }}
+        </div>
+    @endif
 </div>
 
 {{-- STUDENT TABLE --}}
@@ -164,35 +213,62 @@
                     <td>{{ $student->phone_no ?? '-' }}</td>
                     <td>
                         @if($student->status === 'active')
-                            <span class="badge" style="background:#E1F5EE;color:#085041;">Active</span>
+                            <span class="badge" style="background:#D1FAE5;color:#065F46;">Active</span>
                         @else
-                            <span class="badge" style="background:#FAECE7;color:#712B13;">Inactive</span>
+                            <span class="badge" style="background:#E5E7EB;color:#374151;">Inactive</span>
                         @endif
                     </td>
                     <td>
                         <a href="{{ route('users.student.edit', $student->student_id) }}"
                            class="btn btn-sm btn-outline-secondary">✏️ Edit</a>
-                        <form method="POST"
-                              action="{{ route('users.student.destroy', $student->student_id) }}"
-                              style="display:inline;"
-                              onsubmit="return confirm('Delete this student account?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="btn btn-sm btn-outline-danger">🗑️</button>
-                        </form>
+                        @if($student->status === 'inactive')
+                            <span class="badge" style="background:#E5E7EB;color:#374151;" title="Reactivate via Edit by setting status to Active">
+                                📦 Archived
+                            </span>
+                        @elseif($student->hasHistoricalRecords())
+                            <form method="POST"
+                                  action="{{ route('users.student.destroy', $student->student_id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('This student account has related bookings/borrowings. It will be archived (deactivated) instead of deleted so history is preserved. Continue?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-warning"
+                                        title="Archive User">📦 Archive User</button>
+                            </form>
+                        @else
+                            <form method="POST"
+                                  action="{{ route('users.student.destroy', $student->student_id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Delete this student account? This action is permanent.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        title="Delete">🗑️</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
                     <td colspan="7" class="text-center text-muted py-3">
-                        No student accounts found
+                        @if(request('search'))
+                            No student accounts match "{{ request('search') }}"
+                        @else
+                            No student accounts found
+                        @endif
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @if($studentList->hasPages())
+        <div class="card-footer bg-white">
+            {{ $studentList->links('pagination::bootstrap-5') }}
+        </div>
+    @endif
 </div>
 
 @endsection

@@ -11,7 +11,7 @@
 
         /* NAVBAR */
         .navbar {
-            background: #1a1a2e;
+            background: #1E1B2E;
             padding: 0 40px;
             display: flex;
             align-items: center;
@@ -34,7 +34,9 @@
         .navbar-menu {
             display: flex;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
         }
         .nav-item {
             color: rgba(255,255,255,0.7);
@@ -46,11 +48,11 @@
             transition: all 0.2s;
         }
         .nav-item:hover {
-            background: rgba(255,255,255,0.1);
-            color: #ffffff;
+            background: rgba(124,58,237,0.15);
+            color: #C084FC;
         }
         .nav-item.active {
-            background: #1D9E75;
+            background: #7C3AED;
             color: #ffffff;
         }
         .navbar-right {
@@ -69,7 +71,7 @@
         }
         .btn-nav-login:hover { background: rgba(255,255,255,0.1); color: #fff; }
         .btn-nav-register {
-            background: #1D9E75;
+            background: #7C3AED;
             color: #ffffff;
             border: none;
             padding: 6px 16px;
@@ -79,10 +81,10 @@
             font-weight: 500;
             transition: all 0.2s;
         }
-        .btn-nav-register:hover { background: #0F6E56; color: #fff; }
+        .btn-nav-register:hover { background: #6D28D9; color: #fff; }
         .user-pill {
-            background: rgba(29,158,117,0.2);
-            color: #5DCAA5;
+            background: rgba(124,58,237,0.2);
+            color: #C084FC;
             padding: 6px 14px;
             border-radius: 99px;
             font-size: 12px;
@@ -131,11 +133,22 @@
            class="nav-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
             👤 My Dashboard
         </a>
+        <a href="{{ route('student.settings') }}"
+           class="nav-item {{ request()->routeIs('student.settings*') ? 'active' : '' }}">
+            ⚙️ Settings
+        </a>
         @endif
     </div>
 
     <div class="navbar-right">
         @if(session('user_type') === 'student')
+            <form method="GET" action="{{ route('student.search') }}" style="margin:0;">
+                <input type="text"
+                       name="q"
+                       style="font-size:12px; padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:#fff; width:180px;"
+                       placeholder="🔍 Search..."
+                       value="{{ request('q') }}">
+            </form>
             <div class="user-pill">
                 👤 {{ session('user_name') }}
             </div>
@@ -154,7 +167,7 @@
 @yield('content')
 
 {{-- FOOTER --}}
-<div style="background:#1a1a2e; color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:13px; margin-top:60px;">
+<div style="background:#1E1B2E; color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:13px; margin-top:60px;">
     © {{ date('Y') }} UTeM Music Studio Management System
 </div>
 

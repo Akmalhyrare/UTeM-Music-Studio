@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class BorrowingDetail extends Model
 {
     protected $table = 'borrowing_details';
-    protected $primaryKey = 'borrow_detail_id';
+
+    // Pure bridge table: composite primary key (borrow_id, item_id), no surrogate id.
+    public $incrementing = false;
 
     protected $fillable = [
         'borrow_id',

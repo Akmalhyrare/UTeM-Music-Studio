@@ -2,19 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Staff;
 use App\Models\Student;
+use App\Rules\StrongPassword;
+use App\Rules\ValidEmailDomain;
+use App\Support\Search;
 
 class UserManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $staffList   = Staff::orderBy('staff_id', 'desc')->get();
-        $studentList = Student::orderBy('student_id', 'desc')->get();
+        $staffQuery   = Staff::query();
+        $studentQuery = Student::query();
 
-        return view('admin.users.index', compact('staffList', 'studentList'));
+        Search::apply($staffQuery, $request->search, Staff::searchableColumns());
+        Search::apply($studentQuery, $request->search, Student::searchableColumns());
+
+        $adminCount   = (clone $staffQuery)->where('is_admin', true)->count();
+        $staffTotal   = (clone $staffQuery)->count();
+        $studentTotal = (clone $studentQuery)->count();
+
+        $staffList   = $staffQuery->orderBy('staff_id', 'desc')->paginate(15, ['*'], 'staffPage')->withQueryString();
+        $studentList = $studentQuery->orderBy('student_id', 'desc')->paginate(15, ['*'], 'studentPage')->withQueryString();
+
+        return view('admin.users.index', compact('staffList', 'studentList', 'adminCount', 'staffTotal', 'studentTotal'));
     }
 
     // ── STAFF ──────────────────────────────
@@ -28,8 +42,8 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'full_name' => 'required|string|max:100',
-            'email'     => 'required|email|unique:staff,email',
-            'password'  => 'required|min:6',
+            'email'     => ['required', 'email', new ValidEmailDomain(), 'unique:staff,email'],
+            'password'  => ['required', new StrongPassword()],
             'phone_no'  => 'nullable|string|max:20',
             'position'  => 'nullable|string|max:50',
             'status'    => 'required',
@@ -61,7 +75,8 @@ class UserManagementController extends Controller
 
         $request->validate([
             'full_name' => 'required|string|max:100',
-            'email'     => 'required|email|unique:staff,email,' . $id . ',staff_id',
+            'email'     => ['required', 'email', new ValidEmailDomain(), 'unique:staff,email,' . $id . ',staff_id'],
+            'password'  => ['nullable', new StrongPassword()],
             'phone_no'  => 'nullable|string|max:20',
             'position'  => 'nullable|string|max:50',
             'status'    => 'required',
@@ -89,15 +104,46 @@ class UserManagementController extends Controller
 
     public function destroyStaff($id)
     {
-        $staff = Staff::findOrFail($id);
+        $staff = Staff::find($id);
 
-        // Prevent deleting yourself
-        if ($staff->staff_id == session('user_id')) {
+        if (! $staff) {
             return redirect()->route('users.index')
-                             ->with('error', 'You cannot delete your own account!');
+                             ->with('error', 'Staff account not found.');
         }
 
-        $staff->delete();
+        // A staff member (including an admin) can never remove their own account
+        if ($staff->staff_id == session('user_id')) {
+            return redirect()->route('users.index')
+                             ->with('error', 'You cannot delete your own account.');
+        }
+
+        // Already archived — nothing further to do from this action
+        if ($staff->status === 'inactive') {
+            return redirect()->route('users.index')
+                             ->with('error', 'This staff account is already archived.');
+        }
+
+        // Staff referenced by approvals/collections/returns/maintenance/bookings
+        // cannot be physically deleted without destroying audit history —
+        // archive (deactivate) the account instead.
+        if ($staff->hasHistoricalRecords()) {
+            $staff->update(['status' => 'inactive']);
+
+            return redirect()->route('users.index')
+                             ->with('success', 'Staff account has related records and was archived (deactivated) instead of deleted. Their history remains intact for reports and audits.');
+        }
+
+        try {
+            $staff->delete();
+        } catch (QueryException $e) {
+            // Defense in depth: if the database still rejects the delete
+            // because of a foreign key, fall back to archival.
+            $staff->update(['status' => 'inactive']);
+
+            return redirect()->route('users.index')
+                             ->with('success', 'Staff account has related records and was archived (deactivated) instead of deleted.');
+        }
+
         return redirect()->route('users.index')
                          ->with('success', 'Staff account deleted successfully!');
     }
@@ -113,8 +159,8 @@ class UserManagementController extends Controller
     {
         $request->validate([
             'full_name' => 'required|string|max:100',
-            'email'     => 'required|email|unique:students,email',
-            'password'  => 'required|min:6',
+            'email'     => ['required', 'email', new ValidEmailDomain(), 'unique:students,email'],
+            'password'  => ['required', new StrongPassword()],
             'phone_no'  => 'nullable|string|max:20',
             'matric_no' => 'required|string|max:20|unique:students,matric_no',
             'status'    => 'required',
@@ -145,7 +191,8 @@ class UserManagementController extends Controller
 
         $request->validate([
             'full_name' => 'required|string|max:100',
-            'email'     => 'required|email|unique:students,email,' . $id . ',student_id',
+            'email'     => ['required', 'email', new ValidEmailDomain(), 'unique:students,email,' . $id . ',student_id'],
+            'password'  => ['nullable', new StrongPassword()],
             'phone_no'  => 'nullable|string|max:20',
             'matric_no' => 'required|string|max:20|unique:students,matric_no,' . $id . ',student_id',
             'status'    => 'required',
@@ -171,8 +218,39 @@ class UserManagementController extends Controller
 
     public function destroyStudent($id)
     {
-        $student = Student::findOrFail($id);
-        $student->delete();
+        $student = Student::find($id);
+
+        if (! $student) {
+            return redirect()->route('users.index')
+                             ->with('error', 'Student account not found.');
+        }
+
+        // Already archived — nothing further to do from this action
+        if ($student->status === 'inactive') {
+            return redirect()->route('users.index')
+                             ->with('error', 'This student account is already archived.');
+        }
+
+        // Students with borrowings/bookings cannot be physically deleted —
+        // those tables use ON DELETE RESTRICT to protect historical/report
+        // data. Archive (deactivate) the account instead.
+        if ($student->hasHistoricalRecords()) {
+            $student->update(['status' => 'inactive']);
+
+            return redirect()->route('users.index')
+                             ->with('success', 'Student account has related bookings/borrowings and was archived (deactivated) instead of deleted. Their history remains intact for reports and audits.');
+        }
+
+        try {
+            $student->delete();
+        } catch (QueryException $e) {
+            // Defense in depth: if the database still rejects the delete
+            // because of a foreign key, fall back to archival.
+            $student->update(['status' => 'inactive']);
+
+            return redirect()->route('users.index')
+                             ->with('success', 'Student account has related records and was archived (deactivated) instead of deleted.');
+        }
 
         return redirect()->route('users.index')
                          ->with('success', 'Student account deleted successfully!');

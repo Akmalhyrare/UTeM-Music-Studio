@@ -117,7 +117,7 @@
             <div class="d-flex gap-2">
                 <button type="submit"
                         class="btn"
-                        style="background:#1D9E75;color:#fff;font-size:13px;border-radius:8px;">
+                        style="background:#7C3AED;color:#fff;font-size:13px;border-radius:8px;">
                     ✅ Update Item
                 </button>
                 <a href="{{ route('inventory.index') }}"
@@ -130,5 +130,101 @@
         </form>
     </div>
 </div>
+
+{{-- IMAGE GALLERY --}}
+<div class="card border-0 shadow-sm mt-4" style="max-width:600px;">
+    <div class="card-header bg-white border-bottom" style="font-weight:600;">🖼️ Image Gallery</div>
+    <div class="card-body p-4">
+
+        <form method="POST" action="{{ route('inventory.images.store', $item->item_id) }}"
+              enctype="multipart/form-data" class="mb-3">
+            @csrf
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <input type="file" name="images[]" class="form-control" style="font-size:13px; max-width:400px;"
+                       accept="image/jpeg,image/jpg,image/png,image/webp" multiple>
+                <button type="submit" class="btn btn-sm" style="background:#7C3AED;color:#fff;border-radius:8px;">
+                    ⬆️ Upload
+                </button>
+            </div>
+            <small class="text-muted">JPG, JPEG, PNG or WEBP. Max 5MB each. Up to 10 images total ({{ $item->images->count() }}/10 used).</small>
+        </form>
+
+        @if($item->images->isEmpty())
+            <p class="text-muted mb-0">No gallery images uploaded yet.</p>
+        @else
+        <div id="image-gallery" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;">
+            @foreach($item->images as $image)
+            <div class="card border-0 shadow-sm" data-image-id="{{ $image->image_id }}" style="overflow:hidden;">
+                <div style="position:relative;">
+                    <img src="{{ $image->thumbnailUrl() }}"
+                         style="width:100%; height:110px; object-fit:cover; display:block;">
+                    @if($image->is_primary)
+                        <span class="badge" style="position:absolute; top:6px; left:6px; background:#7C3AED; color:#fff;">Primary</span>
+                    @endif
+                </div>
+                <div class="card-body p-2 d-flex flex-wrap gap-1 justify-content-center">
+                    <button type="button" class="btn btn-sm btn-outline-secondary move-up" title="Move up" style="font-size:11px; padding:2px 6px;">↑</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary move-down" title="Move down" style="font-size:11px; padding:2px 6px;">↓</button>
+                    @if(!$image->is_primary)
+                    <form method="POST" action="{{ route('inventory.images.primary', [$item->item_id, $image->image_id]) }}" style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-sm btn-outline-success" style="font-size:11px; padding:2px 6px;">Set Primary</button>
+                    </form>
+                    @endif
+                    @if(session('is_admin'))
+                    <form method="POST" action="{{ route('inventory.images.destroy', [$item->item_id, $image->image_id]) }}"
+                          style="display:inline;" onsubmit="return confirm('Delete this image?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size:11px; padding:2px 6px;">🗑️</button>
+                    </form>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </div>
+</div>
+
+<script>
+const inventoryItemId = {{ $item->item_id }};
+
+// Image reordering
+const itemGallery = document.getElementById('image-gallery');
+if (itemGallery) {
+    function persistItemImageOrder() {
+        const ids = Array.from(itemGallery.children).map(el => el.dataset.imageId);
+        fetch(`/inventory/${inventoryItemId}/images/reorder`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ image_ids: ids })
+        });
+    }
+
+    itemGallery.addEventListener('click', function (e) {
+        const card = e.target.closest('[data-image-id]');
+        if (!card) return;
+
+        if (e.target.classList.contains('move-up')) {
+            const prev = card.previousElementSibling;
+            if (prev) {
+                itemGallery.insertBefore(card, prev);
+                persistItemImageOrder();
+            }
+        } else if (e.target.classList.contains('move-down')) {
+            const next = card.nextElementSibling;
+            if (next) {
+                itemGallery.insertBefore(next, card);
+                persistItemImageOrder();
+            }
+        }
+    });
+}
+</script>
 
 @endsection

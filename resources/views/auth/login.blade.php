@@ -7,7 +7,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
-            background-color: #1a1a2e;
+            background-image: url('{{ asset('images/login-bg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -28,7 +31,7 @@
         .login-logo h4 {
             font-size: 20px;
             font-weight: 700;
-            color: #1a1a2e;
+            color: #211C36;
             margin: 10px 0 4px;
         }
         .login-logo p {
@@ -48,11 +51,11 @@
             border: 1px solid #ddd;
         }
         .form-control:focus {
-            border-color: #1D9E75;
-            box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+            border-color: #7C3AED;
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
         }
         .btn-login {
-            background: #1D9E75;
+            background: #7C3AED;
             color: #ffffff;
             border: none;
             border-radius: 8px;
@@ -64,11 +67,11 @@
             transition: background 0.2s;
         }
         .btn-login:hover {
-            background: #0F6E56;
+            background: #6D28D9;
         }
         .error-msg {
-            background: #FAECE7;
-            color: #712B13;
+            background: #FEE2E2;
+            color: #991B1B;
             border-radius: 8px;
             padding: 10px 14px;
             font-size: 13px;
@@ -102,6 +105,8 @@
                    class="form-control"
                    placeholder="Enter your email"
                    value="{{ old('email') }}"
+                   pattern="[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}"
+                   title="Please enter a valid email address with a domain extension (e.g. .com, .edu.my)."
                    required autofocus>
         </div>
 
@@ -119,7 +124,7 @@
         </button>
     </form>
     <div style="text-align:center; margin-top:16px; font-size:13px; color:#888;">
-    New Student? <a href="{{ route('register') }}" style="color:#1D9E75;font-weight:500;text-decoration:none;">
+    New Student? <a href="{{ route('register') }}" style="color:#7C3AED;font-weight:500;text-decoration:none;">
         Register here
     </a>
 </div>

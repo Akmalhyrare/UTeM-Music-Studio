@@ -1,0 +1,221 @@
+@startuml ERD_UTeM_Music_Studio
+
+' ---------------------------------------------------------------
+' Entity Relationship Diagram - UTeM Music Studio
+' Generated from database/sql/current_schema_ddl.sql
+' ---------------------------------------------------------------
+
+hide circle
+skinparam linetype ortho
+
+entity "students" as students {
+  * student_id : BIGSERIAL <<PK>>
+  --
+  full_name : VARCHAR(100)
+  email : VARCHAR(100) <<unique>>
+  password : VARCHAR(255)
+  phone_no : VARCHAR(20)
+  matric_no : VARCHAR(20) <<unique>>
+  status : VARCHAR(20)
+  last_login_at : TIMESTAMP
+  password_changed_at : TIMESTAMP
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "staff" as staff {
+  * staff_id : BIGSERIAL <<PK>>
+  --
+  full_name : VARCHAR(100)
+  email : VARCHAR(100) <<unique>>
+  password : VARCHAR(255)
+  phone_no : VARCHAR(20)
+  position : VARCHAR(50)
+  status : VARCHAR(20)
+  is_admin : BOOLEAN
+  last_login_at : TIMESTAMP
+  password_changed_at : TIMESTAMP
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "categories" as categories {
+  * category_id : BIGSERIAL <<PK>>
+  --
+  category_name : VARCHAR(100)
+  type : VARCHAR(50)
+  description : TEXT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "items" as items {
+  * item_id : BIGSERIAL <<PK>>
+  --
+  # category_id : BIGINT <<FK>>
+  item_name : VARCHAR(100)
+  item_description : TEXT
+  quantity : INTEGER
+  available_quantity : INTEGER
+  condition_status : VARCHAR(50)
+  item_status : VARCHAR(50)
+  date_added : DATE
+  image : VARCHAR(255)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "item_images" as item_images {
+  * image_id : BIGSERIAL <<PK>>
+  --
+  # item_id : BIGINT <<FK>>
+  image_path : VARCHAR(255)
+  position : INTEGER
+  is_primary : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "studios" as studios {
+  * studio_id : BIGSERIAL <<PK>>
+  --
+  studio_name : VARCHAR(100)
+  studio_type : VARCHAR(50)
+  description : TEXT
+  status : VARCHAR(20)
+  capacity : INTEGER
+  equipment : TEXT
+  location : VARCHAR(150)
+  size : VARCHAR(50)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "studio_images" as studio_images {
+  * image_id : BIGSERIAL <<PK>>
+  --
+  # studio_id : BIGINT <<FK>>
+  image_path : VARCHAR(255)
+  position : INTEGER
+  is_primary : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "studio_unavailability" as studio_unavailability {
+  * unavailability_id : BIGSERIAL <<PK>>
+  --
+  # studio_id : BIGINT <<FK>>
+  # staff_id : BIGINT <<FK>>
+  type : VARCHAR(20)
+  start_at : TIMESTAMP
+  end_at : TIMESTAMP
+  reason : TEXT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "borrowings" as borrowings {
+  * borrow_id : BIGSERIAL <<PK>>
+  --
+  # student_id : BIGINT <<FK>>
+  # staff_id : BIGINT <<FK>>
+  # collected_by : BIGINT <<FK>>
+  # returned_by : BIGINT <<FK>>
+  pickup_date : DATE
+  return_date : DATE
+  borrow_status : VARCHAR(50)
+  purpose : TEXT
+  collected_at : TIMESTAMP
+  returned_at : TIMESTAMP
+  is_overdue : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "borrowing_details" as borrowing_details {
+  * borrow_detail_id : BIGSERIAL <<PK>>
+  --
+  # borrow_id : BIGINT <<FK>>
+  # item_id : BIGINT <<FK>>
+  quantity_borrowed : INTEGER
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "return_records" as return_records {
+  * return_id : BIGSERIAL <<PK>>
+  --
+  # borrow_id : BIGINT <<FK>>
+  # item_id : BIGINT <<FK>>
+  # staff_id : BIGINT <<FK>>
+  return_date : DATE
+  quantity_returned : INTEGER
+  item_condition : VARCHAR(50)
+  damage_note : TEXT
+  return_status : VARCHAR(50)
+  remarks : TEXT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "maintenances" as maintenances {
+  * maintenance_id : BIGSERIAL <<PK>>
+  --
+  # item_id : BIGINT <<FK>>
+  # staff_id : BIGINT <<FK>>
+  # return_id : BIGINT <<FK>>
+  report_date : DATE
+  issue_type : VARCHAR(100)
+  description : TEXT
+  maintenance_status : VARCHAR(50)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "bookings" as bookings {
+  * booking_id : BIGSERIAL <<PK>>
+  --
+  # student_id : BIGINT <<FK>>
+  # staff_id : BIGINT <<FK>>
+  # studio_id : BIGINT <<FK>>
+  booking_date : DATE
+  start_time : TIME
+  end_time : TIME
+  booking_status : VARCHAR(50)
+  purpose : TEXT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+' ---------------------------------------------------------------
+' Relationships
+' ---------------------------------------------------------------
+
+categories ||--o{ items : "category_id"
+items ||--o{ item_images : "item_id (cascade)"
+items ||--o{ borrowing_details : "item_id"
+items ||--o{ return_records : "item_id"
+items ||--o{ maintenances : "item_id"
+
+students ||--o{ borrowings : "student_id"
+students ||--o{ bookings : "student_id"
+
+staff |o--o{ borrowings : "staff_id (approver)"
+staff |o--o{ borrowings : "collected_by"
+staff |o--o{ borrowings : "returned_by"
+staff |o--o{ return_records : "staff_id"
+staff |o--o{ maintenances : "staff_id"
+staff |o--o{ bookings : "staff_id"
+staff |o--o{ studio_unavailability : "staff_id"
+
+studios ||--o{ studio_images : "studio_id (cascade)"
+studios ||--o{ studio_unavailability : "studio_id (cascade)"
+studios ||--o{ bookings : "studio_id"
+
+borrowings ||--o{ borrowing_details : "borrow_id (cascade)"
+borrowings ||--o{ return_records : "borrow_id"
+
+return_records |o--o{ maintenances : "return_id (optional)"
+
+@enduml

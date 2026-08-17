@@ -4,10 +4,14 @@
 
 @section('content')
 
+@if (session('error'))
+<div class="alert alert-danger" style="font-size:13px;">{{ session('error') }}</div>
+@endif
+
 <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:16px; margin-bottom:24px;">
     <div class="card border-0 shadow-sm">
         <div class="card-body d-flex align-items-center gap-3">
-            <div class="p-2 rounded" style="background:#E1F5EE;">
+            <div class="p-2 rounded" style="background:#F3E8FF;">
                 <span style="font-size:20px;">📦</span>
             </div>
             <div>
@@ -46,6 +50,42 @@
             <div>
                 <h4 class="mb-0 fw-bold">{{ $todayBookings }}</h4>
                 <small class="text-muted">Bookings today</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-bottom:24px;">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            <div class="p-2 rounded" style="background:#D1FAE5;">
+                <span style="font-size:20px;">📦</span>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">{{ $todaysPickups }}</h4>
+                <small class="text-muted">Pickups today</small>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            <div class="p-2 rounded" style="background:#DBEAFE;">
+                <span style="font-size:20px;">↩️</span>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">{{ $todaysReturns }}</h4>
+                <small class="text-muted">Returns due today</small>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body d-flex align-items-center gap-3">
+            <div class="p-2 rounded" style="background:#FBE3E3;">
+                <span style="font-size:20px;">⚠️</span>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">{{ $overdueReturns }}</h4>
+                <small class="text-muted">Overdue returns</small>
             </div>
         </div>
     </div>

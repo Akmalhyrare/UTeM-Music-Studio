@@ -104,7 +104,7 @@
             <div class="d-flex gap-2">
                 <button type="submit"
                         class="btn"
-                        style="background:#1D9E75;color:#fff;font-size:13px;border-radius:8px;">
+                        style="background:#7C3AED;color:#fff;font-size:13px;border-radius:8px;">
                     ✅ Save Item
                 </button>
                 <a href="{{ route('inventory.index') }}"

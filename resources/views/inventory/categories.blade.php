@@ -65,7 +65,7 @@
 
                 <button type="submit"
                         class="btn w-100"
-                        style="background:#1D9E75;color:#fff;font-size:13px;border-radius:8px;">
+                        style="background:#7C3AED;color:#fff;font-size:13px;border-radius:8px;">
                     ✅ Save Category
                 </button>
             </form>

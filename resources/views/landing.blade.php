@@ -7,9 +7,12 @@
 
 /* HERO */
 .hero {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background-image: url('{{ asset('images/studio-control-room.jpg') }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: #fff;
-    padding: 100px 40px 80px;
+    padding: 140px 40px 120px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -21,17 +24,30 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at 30% 50%, rgba(29,158,117,0.08) 0%, transparent 50%),
-                radial-gradient(circle at 70% 30%, rgba(55,138,221,0.08) 0%, transparent 50%);
+    background:
+        linear-gradient(rgba(10, 14, 26, 0.65), rgba(10, 14, 26, 0.65)),
+        radial-gradient(circle at 30% 50%, rgba(124,58,237,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 70% 30%, rgba(192,132,252,0.08) 0%, transparent 50%);
     pointer-events: none;
+}
+.hero-content {
+    background: rgba(26, 26, 36, 0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 40px 32px;
+    max-width: 640px;
+    margin: 0 auto 32px;
+    backdrop-filter: blur(6px);
+    position: relative;
+    z-index: 1;
 }
 .hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(29,158,117,0.15);
-    border: 1px solid rgba(29,158,117,0.3);
-    color: #5DCAA5;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: #C4B5FD;
     padding: 6px 14px;
     border-radius: 99px;
     font-size: 12px;
@@ -41,25 +57,25 @@
 .hero h1 {
     font-size: 48px;
     font-weight: 800;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     line-height: 1.15;
     letter-spacing: -1px;
 }
-.hero h1 span { color: #1D9E75; }
+.hero h1 span { color: #C084FC; }
 .hero p {
     font-size: 17px;
     color: rgba(255,255,255,0.65);
     max-width: 520px;
-    margin: 0 auto 36px;
+    margin: 0 auto 28px;
     line-height: 1.7;
 }
-.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
 .btn-primary-lg {
-    background: #1D9E75;
+    background: #7C3AED;
     color: #fff;
-    padding: 14px 32px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s;
@@ -67,33 +83,19 @@
     align-items: center;
     gap: 8px;
 }
-.btn-primary-lg:hover { background: #0F6E56; color: #fff; transform: translateY(-2px); }
+.btn-primary-lg:hover { background: #6D28D9; color: #fff; transform: translateY(-2px); }
 .btn-outline-lg {
     background: rgba(255,255,255,0.08);
     color: #fff;
-    border: 1px solid rgba(255,255,255,0.25);
-    padding: 14px 32px;
-    border-radius: 12px;
-    font-size: 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s;
 }
-.btn-outline-lg:hover { background: rgba(255,255,255,0.15); color: #fff; }
-.hero-preview {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 700px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-.hero-preview-stat { text-align: center; }
-.hero-preview-stat .num { font-size: 28px; font-weight: 800; color: #1D9E75; }
-.hero-preview-stat .lbl { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.btn-outline-lg:hover { background: rgba(255,255,255,0.18); color: #fff; }
 
 /* STATS BAR */
 .stats-section {
@@ -114,8 +116,8 @@
     border-right: 1px solid #f0f0f0;
 }
 .stat-box:last-child { border-right: none; }
-.stat-box .num { font-size: 32px; font-weight: 800; color: #1a1a2e; }
-.stat-box .num span { color: #1D9E75; }
+.stat-box .num { font-size: 32px; font-weight: 800; color: #211C36; }
+.stat-box .num span { color: #7C3AED; }
 .stat-box .lbl { font-size: 13px; color: #888; margin-top: 4px; }
 
 /* SECTIONS */
@@ -124,8 +126,8 @@
 .section-inner { max-width: 1100px; margin: 0 auto; }
 .section-tag {
     display: inline-block;
-    background: #E1F5EE;
-    color: #0F6E56;
+    background: #F3E8FF;
+    color: #6D28D9;
     padding: 4px 12px;
     border-radius: 99px;
     font-size: 12px;
@@ -137,7 +139,7 @@
 .section-title {
     font-size: 32px;
     font-weight: 800;
-    color: #1a1a2e;
+    color: #211C36;
     margin-bottom: 10px;
     letter-spacing: -0.5px;
 }
@@ -164,34 +166,70 @@
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 3px;
-    background: #1D9E75;
+    background: #7C3AED;
     transform: scaleX(0);
     transition: transform 0.25s;
 }
-.studio-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: #1D9E75; }
+.studio-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: #7C3AED; }
 .studio-card:hover::before { transform: scaleX(1); }
 .studio-icon {
     width: 60px;
     height: 60px;
     border-radius: 16px;
-    background: #E1F5EE;
+    background: #F3E8FF;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 16px;
     font-size: 26px;
 }
-.studio-name { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+.studio-name { font-size: 15px; font-weight: 700; color: #211C36; margin-bottom: 6px; }
 .studio-desc { font-size: 13px; color: #888; line-height: 1.5; margin-bottom: 14px; }
 .studio-badge {
     display: inline-block;
-    background: #E1F5EE;
-    color: #085041;
+    background: #F3E8FF;
+    color: #5B21B6;
     padding: 3px 10px;
     border-radius: 99px;
     font-size: 11px;
     font-weight: 500;
 }
+.studio-badge-maintenance { background: #FFEDD5; color: #9A3412; }
+.studio-badge-blocked { background: #F3F4F6; color: #4B5563; }
+.studio-card-image {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: -28px -24px 16px;
+    width: calc(100% + 48px);
+}
+.studio-meta {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 10px;
+}
+.studio-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+.btn-studio-view, .btn-studio-book {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.btn-studio-view { background: #f0f0f0; color: #211C36; }
+.btn-studio-view:hover { background: #e0e0e0; color: #211C36; }
+.btn-studio-book { background: #7C3AED; color: #fff; }
+.btn-studio-book:hover { background: #6D28D9; color: #fff; }
 
 /* EQUIPMENT */
 .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
@@ -203,7 +241,7 @@
     transition: all 0.25s;
     cursor: pointer;
 }
-.item-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: #1D9E75; }
+.item-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: #7C3AED; }
 .item-img {
     width: 100%;
     height: 180px;
@@ -234,13 +272,13 @@
     font-weight: 500;
 }
 .item-body { padding: 12px 14px; }
-.item-name { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-name { font-size: 13px; font-weight: 700; color: #211C36; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .item-cat { font-size: 11px; color: #aaa; margin-bottom: 10px; }
 .item-footer { display: flex; justify-content: space-between; align-items: center; }
-.badge-avail { background: #E1F5EE; color: #085041; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; }
-.badge-unavail { background: #FAECE7; color: #712B13; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; }
+.badge-avail { background: #D1FAE5; color: #065F46; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; }
+.badge-unavail { background: #FEE2E2; color: #991B1B; padding: 3px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; }
 .btn-borrow-sm {
-    background: #1D9E75;
+    background: #7C3AED;
     color: #fff;
     padding: 5px 12px;
     border-radius: 8px;
@@ -249,13 +287,13 @@
     text-decoration: none;
     transition: all 0.2s;
 }
-.btn-borrow-sm:hover { background: #0F6E56; color: #fff; }
+.btn-borrow-sm:hover { background: #6D28D9; color: #fff; }
 .view-all-wrap { text-align: center; margin-top: 36px; }
 .btn-view-all {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #1a1a2e;
+    background: #211C36;
     color: #fff;
     padding: 13px 32px;
     border-radius: 12px;
@@ -264,7 +302,7 @@
     text-decoration: none;
     transition: all 0.2s;
 }
-.btn-view-all:hover { background: #0f3460; color: #fff; transform: translateY(-2px); }
+.btn-view-all:hover { background: #5B21B6; color: #fff; transform: translateY(-2px); }
 
 /* FEATURES */
 .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
@@ -275,19 +313,19 @@
     padding: 24px;
     transition: all 0.25s;
 }
-.feature-card:hover { border-color: #1D9E75; box-shadow: 0 8px 20px rgba(29,158,117,0.1); }
+.feature-card:hover { border-color: #7C3AED; box-shadow: 0 8px 20px rgba(124,58,237,0.1); }
 .feature-icon {
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: #E1F5EE;
+    background: #F3E8FF;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22px;
     margin-bottom: 14px;
 }
-.feature-title { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+.feature-title { font-size: 14px; font-weight: 700; color: #211C36; margin-bottom: 6px; }
 .feature-desc { font-size: 13px; color: #888; line-height: 1.6; }
 
 /* HOW IT WORKS */
@@ -297,7 +335,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #1D9E75;
+    background: #7C3AED;
     color: #fff;
     font-size: 18px;
     font-weight: 800;
@@ -306,7 +344,7 @@
     justify-content: center;
     margin: 0 auto 16px;
 }
-.step-title { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+.step-title { font-size: 14px; font-weight: 700; color: #211C36; margin-bottom: 6px; }
 .step-desc { font-size: 13px; color: #888; line-height: 1.6; }
 .step-connector {
     display: none;
@@ -322,7 +360,7 @@
 .gallery-item {
     border-radius: 14px;
     overflow: hidden;
-    background: #1a1a2e;
+    background: #211C36;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -343,11 +381,11 @@
 .gallery-item .gallery-emoji { font-size: 40px; }
 .gallery-item .gallery-label { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
 .gallery-item .gallery-sub { font-size: 12px; color: rgba(255,255,255,0.5); }
-.gallery-item.music { background: linear-gradient(135deg, #0f3460, #16213e); }
+.gallery-item.music { background: linear-gradient(135deg, #5B21B6, #3B2360); }
 .gallery-item.dance { background: linear-gradient(135deg, #2d1b4e, #1a0a2e); }
 .gallery-item.gamelan { background: linear-gradient(135deg, #1a2e1a, #0a1e0a); }
 .gallery-item.caklempong { background: linear-gradient(135deg, #2e1a0f, #1e0a00); }
-.gallery-item.attire { background: linear-gradient(135deg, #1a1a2e, #0f0f1e); }
+.gallery-item.attire { background: linear-gradient(135deg, #211C36, #0f0f1e); }
 
 /* TESTIMONIALS */
 .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
@@ -364,15 +402,15 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #E1F5EE;
-    color: #0F6E56;
+    background: #F3E8FF;
+    color: #6D28D9;
     font-size: 13px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.testimonial-name { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+.testimonial-name { font-size: 13px; font-weight: 700; color: #211C36; }
 .testimonial-role { font-size: 11px; color: #aaa; }
 
 /* FAQ */
@@ -387,7 +425,7 @@
     padding: 16px 20px;
     font-size: 14px;
     font-weight: 600;
-    color: #1a1a2e;
+    color: #211C36;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -396,7 +434,7 @@
     user-select: none;
 }
 .faq-q:hover { background: #f8f9fa; }
-.faq-q .faq-icon { font-size: 18px; color: #1D9E75; transition: transform 0.25s; }
+.faq-q .faq-icon { font-size: 18px; color: #7C3AED; transition: transform 0.25s; }
 .faq-q.open .faq-icon { transform: rotate(45deg); }
 .faq-a {
     padding: 0 20px;
@@ -412,7 +450,7 @@
 
 /* CTA */
 .cta-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    background: linear-gradient(135deg, #211C36 0%, #5B21B6 100%);
     padding: 80px 40px;
     text-align: center;
     color: #fff;
@@ -439,7 +477,7 @@
 .footer-brand p { font-size: 13px; line-height: 1.6; }
 .footer-col h5 { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.8); margin-bottom: 12px; }
 .footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.4); text-decoration: none; margin-bottom: 6px; transition: color 0.2s; }
-.footer-col a:hover { color: #1D9E75; }
+.footer-col a:hover { color: #7C3AED; }
 .footer-bottom {
     max-width: 1100px;
     margin: 0 auto;
@@ -452,7 +490,7 @@
     flex-wrap: wrap;
     gap: 8px;
 }
-.footer-bottom a { color: #1D9E75; text-decoration: none; }
+.footer-bottom a { color: #7C3AED; text-decoration: none; }
 
 /* MODAL */
 .modal-overlay {
@@ -511,7 +549,7 @@
 }
 .modal-body { padding: 24px; }
 .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-.modal-name { font-size: 20px; font-weight: 800; color: #1a1a2e; margin-bottom: 4px; }
+.modal-name { font-size: 20px; font-weight: 800; color: #211C36; margin-bottom: 4px; }
 .modal-cat { font-size: 13px; color: #aaa; }
 .modal-stats {
     display: grid;
@@ -523,12 +561,12 @@
     margin-bottom: 16px;
 }
 .modal-stat-item .modal-stat-label { font-size: 11px; color: #aaa; margin-bottom: 3px; }
-.modal-stat-item .modal-stat-val { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+.modal-stat-item .modal-stat-val { font-size: 14px; font-weight: 700; color: #211C36; }
 .modal-desc { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 20px; }
 .modal-actions { display: flex; gap: 10px; }
 .modal-btn-borrow {
     flex: 1;
-    background: #1D9E75;
+    background: #7C3AED;
     color: #fff;
     border: none;
     padding: 12px;
@@ -540,7 +578,7 @@
     display: block;
     transition: all 0.2s;
 }
-.modal-btn-borrow:hover { background: #0F6E56; color: #fff; }
+.modal-btn-borrow:hover { background: #6D28D9; color: #fff; }
 .modal-btn-close {
     padding: 12px 20px;
     border-radius: 12px;
@@ -559,29 +597,17 @@
 
 {{-- ① HERO --}}
 <div class="hero">
-    <div class="hero-badge">🎵 UTeM Music Studio Management System</div>
-    <h1>Your Music Journey<br>Starts <span>Here</span></h1>
-    <p>Browse musical equipment, formal attire and book studio sessions — all in one centralized platform.</p>
-    <div class="hero-btns">
-        <a href="{{ route('items.browse') }}" class="btn-primary-lg">🎸 Browse Equipment</a>
-        @if(!session('user_type'))
-            <a href="{{ route('register') }}" class="btn-outline-lg">Register as Student →</a>
-        @else
-            <a href="{{ route('student.dashboard') }}" class="btn-outline-lg">My Dashboard →</a>
-        @endif
-    </div>
-    <div class="hero-preview">
-        <div class="hero-preview-stat">
-            <div class="num">{{ $totalItems }}+</div>
-            <div class="lbl">Items available</div>
-        </div>
-        <div class="hero-preview-stat">
-            <div class="num">4</div>
-            <div class="lbl">Studios</div>
-        </div>
-        <div class="hero-preview-stat">
-            <div class="num">{{ $availableItems }}</div>
-            <div class="lbl">Ready to borrow</div>
+    <div class="hero-content">
+        <div class="hero-badge">🎵 UTeM Music Studio Management System</div>
+        <h1>Your Music Journey<br>Starts <span>Here</span></h1>
+        <p>Browse musical equipment, formal attire and book studio sessions — all in one centralized platform.</p>
+        <div class="hero-btns">
+            <a href="{{ route('items.browse') }}" class="btn-primary-lg">🎸 Browse Equipment</a>
+            @if(!session('user_type'))
+                <a href="{{ route('register') }}" class="btn-outline-lg">Register as Student →</a>
+            @else
+                <a href="{{ route('student.dashboard') }}" class="btn-outline-lg">My Dashboard →</a>
+            @endif
         </div>
     </div>
 </div>
@@ -613,34 +639,44 @@
     <div class="section-inner">
         <div class="text-center">
             <span class="section-tag">Our Studios</span>
-            <div class="section-title">4 Dedicated Studio Spaces</div>
+            <div class="section-title">Dedicated Studio Spaces</div>
             <div class="section-sub">Each studio is purpose-built for its genre — book your session online in minutes.</div>
         </div>
         <div class="studio-grid">
-            <a href="{{ route('studios.browse') }}" class="studio-card">
-                <div class="studio-icon">🎸</div>
-                <div class="studio-name">Music Studio</div>
-                <div class="studio-desc">Full-equipped practice and recording space for bands, soloists and ensembles.</div>
-                <span class="studio-badge">Available</span>
-            </a>
-            <a href="{{ route('studios.browse') }}" class="studio-card">
-                <div class="studio-icon">💃</div>
-                <div class="studio-name">Dance Studio</div>
-                <div class="studio-desc">Mirrored studio with sprung floor for choreography, rehearsals and performances.</div>
-                <span class="studio-badge">Available</span>
-            </a>
-            <a href="{{ route('studios.browse') }}" class="studio-card">
-                <div class="studio-icon">🥁</div>
-                <div class="studio-name">Gamelan Studio</div>
-                <div class="studio-desc">Dedicated space for traditional Javanese gamelan ensemble practice and learning.</div>
-                <span class="studio-badge">Available</span>
-            </a>
-            <a href="{{ route('studios.browse') }}" class="studio-card">
-                <div class="studio-icon">🎶</div>
-                <div class="studio-name">Caklempong Studio</div>
-                <div class="studio-desc">Specially designed for traditional Malay caklempong instrument practice sessions.</div>
-                <span class="studio-badge">Available</span>
-            </a>
+            @forelse($studios as $studio)
+            <div class="studio-card">
+                @if($studio->primaryImage)
+                    <img src="{{ asset('storage/' . $studio->primaryImage->image_path) }}"
+                         alt="{{ $studio->studio_name }}" class="studio-card-image">
+                @else
+                    <div class="studio-icon">
+                        @if(str_contains(strtolower($studio->studio_name), 'music')) 🎸
+                        @elseif(str_contains(strtolower($studio->studio_name), 'dance')) 💃
+                        @elseif(str_contains(strtolower($studio->studio_name), 'gamelan')) 🥁
+                        @else 🎶
+                        @endif
+                    </div>
+                @endif
+                <div class="studio-name">{{ $studio->studio_name }}</div>
+                <div class="studio-desc">{{ Str::limit($studio->description ?? 'Available for booking', 70) }}</div>
+                <div class="studio-meta">
+                    <span>👥 Capacity: {{ $studio->capacity ?? '-' }}</span>
+                </div>
+                @if($studio->status == 'available')
+                    <span class="studio-badge">Available</span>
+                @elseif($studio->status == 'maintenance')
+                    <span class="studio-badge studio-badge-maintenance">Maintenance</span>
+                @else
+                    <span class="studio-badge studio-badge-blocked">Blocked</span>
+                @endif
+                <div class="studio-card-actions">
+                    <a href="{{ route('studios.show', $studio->studio_id) }}" class="btn-studio-view">View Details</a>
+                    <a href="{{ route('studios.browse') }}" class="btn-studio-book">Book Now</a>
+                </div>
+            </div>
+            @empty
+            <p class="text-center text-muted">No studios available at the moment.</p>
+            @endforelse
         </div>
     </div>
 </div>
@@ -649,13 +685,14 @@
 <div class="section gray">
     <div class="section-inner">
         <div class="text-center">
-            <span class="section-tag">Equipment</span>
+            <span class="section-tag">Equipment and Attire</span>
             <div class="section-title">Browse Our Inventory</div>
             <div class="section-sub">From musical instruments to formal attire — click any item to see full details.</div>
         </div>
         <div class="items-grid">
         @forelse($items->take(8) as $item)
         <div class="item-card"
+            data-id="{{ $item->item_id }}"
             data-name="{{ $item->item_name }}"
             data-category="{{ $item->category->category_name ?? '' }}"
             data-image="{{ $item->image }}"
@@ -770,53 +807,6 @@
     </div>
 </div>
 
-{{-- ⑦ GALLERY --}}
-<div class="section">
-    <div class="section-inner">
-        <div class="text-center">
-            <span class="section-tag">Gallery</span>
-            <div class="section-title">Studio preview</div>
-            <div class="section-sub">Get a feel of our studios and what we have to offer.</div>
-        </div>
-        <div class="gallery-grid">
-            <div class="gallery-item music large">
-                <div class="gallery-inner">
-                    <div class="gallery-emoji">🎸</div>
-                    <div class="gallery-label">Music Studio</div>
-                    <div class="gallery-sub">Practice · Recording · Rehearsal</div>
-                </div>
-            </div>
-            <div class="gallery-item dance">
-                <div class="gallery-inner">
-                    <div class="gallery-emoji">💃</div>
-                    <div class="gallery-label">Dance Studio</div>
-                    <div class="gallery-sub">Choreography · Performance</div>
-                </div>
-            </div>
-            <div class="gallery-item attire">
-                <div class="gallery-inner">
-                    <div class="gallery-emoji">👔</div>
-                    <div class="gallery-label">Formal Attire</div>
-                    <div class="gallery-sub">Blazers · Traditional wear</div>
-                </div>
-            </div>
-            <div class="gallery-item gamelan">
-                <div class="gallery-inner">
-                    <div class="gallery-emoji">🥁</div>
-                    <div class="gallery-label">Gamelan Studio</div>
-                    <div class="gallery-sub">Traditional · Ensemble</div>
-                </div>
-            </div>
-            <div class="gallery-item caklempong large">
-                <div class="gallery-inner">
-                    <div class="gallery-emoji">🎶</div>
-                    <div class="gallery-label">Caklempong Studio</div>
-                    <div class="gallery-sub">Malay traditional music sessions</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 {{-- ⑧ TESTIMONIALS --}}
 <div class="section gray">
@@ -872,41 +862,65 @@
             <div class="section-title">Frequently asked questions</div>
             <div class="section-sub">Got questions? We have answers.</div>
         </div>
-        <div class="faq-list">
-            <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">
-                    Who can use the UTeM Music Studio system?
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-a">Any registered UTeM student can create an account and use the system to browse items, request borrowings and book studio sessions. Staff members manage approvals and inventory.</div>
+                <div class="faq-list">
+                <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Who can use the UTeM Music Studio system?
+                <span class="faq-icon">+</span>
             </div>
-            <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">
-                    How long can I borrow an item?
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-a">Borrowing duration is set when you submit your request. Standard borrowing is up to 7 days. Extensions can be requested through the system if needed.</div>
+            <div class="faq-a">
+                Any registered UTeM student can create an account and use the system to browse instruments, book studio sessions, and manage their bookings online.
             </div>
-            <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">
-                    How do I book a studio session?
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-a">Register or login, go to Studios, select your preferred studio, choose a date and time, and submit your booking request. Staff will approve it and you'll see the status update in your dashboard.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                How long can I borrow an item?
+                <span class="faq-icon">+</span>
             </div>
-            <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">
-                    What happens if I return an item late?
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-a">Late returns are flagged in the system as overdue. Please return items on time so other students can borrow them. Consistent late returns may affect your borrowing privileges.</div>
+            <div class="faq-a">
+                Borrowing duration depends on the item type and availability. The return date will be automatically calculated and shown during the borrowing process.
             </div>
-            <div class="faq-item">
-                <div class="faq-q" onclick="toggleFaq(this)">
-                    Can I cancel a studio booking?
-                    <span class="faq-icon">+</span>
-                </div>
-                <div class="faq-a">Yes, you can cancel a booking from your dashboard as long as it hasn't been approved yet. Once approved, please contact the staff to cancel so the slot can be opened for others.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                How do I book a studio session?
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+                Login to your account, select a studio, choose your preferred date and time, and confirm your booking. 
+                Bookings are confirmed instantly without staff approval, based on real-time availability.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                What happens if I return an item late?
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+                Late returns are recorded in the system. Users are encouraged to return items on time to avoid restrictions on future borrowing.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                Can I cancel a studio booking?
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+                Yes. You can cancel your studio booking anytime as long as the booking date has not passed. Once the scheduled session starts or ends, cancellation is no longer allowed.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+                How can I check studio availability?
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-a">
+                When selecting a studio and date, the system shows a real-time schedule displaying available, booked, and unavailable time slots so you can plan your session easily.
             </div>
         </div>
     </div>
@@ -914,7 +928,7 @@
 
 {{-- ⑩ FINAL CTA --}}
 <div class="cta-section">
-    <span class="section-tag" style="background:rgba(29,158,117,0.2);color:#5DCAA5;">Get started today</span>
+    <span class="section-tag" style="background:rgba(124,58,237,0.2);color:#C4B5FD;">Get started today</span>
     <h2>Ready to get started?</h2>
     <p>Join hundreds of UTeM students already using the system to manage their music studio needs.</p>
     <div class="cta-btns">
@@ -977,7 +991,7 @@
                 </div>
                 <div class="modal-stat-item">
                     <div class="modal-stat-label">Available</div>
-                    <div id="modal-available" class="modal-stat-val" style="color:#1D9E75;"></div>
+                    <div id="modal-available" class="modal-stat-val" style="color:#10B981;"></div>
                 </div>
                 <div class="modal-stat-item">
                     <div class="modal-stat-label">Condition</div>
@@ -990,7 +1004,9 @@
             </div>
             <div id="modal-desc" class="modal-desc"></div>
             <div class="modal-actions">
-                <a id="modal-borrow-btn" href="#" class="modal-btn-borrow">🔒 Login to Borrow</a>
+                <a id="modal-borrow-btn" href="#" class="modal-btn-borrow">
+                    {{ session('user_id') ? '🎸 Borrow' : '🔒 Login to Borrow' }}
+                </a>
                 <button onclick="closeModal()" class="modal-btn-close">Close</button>
             </div>
         </div>
@@ -999,8 +1015,14 @@
 
 <script>
 
+// Blade renders this once at page load — never changes during the page lifecycle.
+// Uses session('user_id') because this system uses custom session auth, not Auth::check().
+const isLoggedIn = @json((bool) session('user_id'));
+const borrowBaseUrl = '{{ route('items.browse') }}';
+
 function openModalFromCard(el) {
     openModal({
+        id: el.dataset.id,
         name: el.dataset.name,
         category: el.dataset.category,
         image: el.dataset.image,
@@ -1029,19 +1051,24 @@ function openModal(item) {
 
     const statusEl = document.getElementById('modal-status');
     if (item.available > 0) {
-        statusEl.innerHTML = '<span style="background:#E1F5EE;color:#085041;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;">Available</span>';
+        statusEl.innerHTML = '<span style="background:#D1FAE5;color:#065F46;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;">Available</span>';
     } else {
-        statusEl.innerHTML = '<span style="background:#FAECE7;color:#712B13;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;">Unavailable</span>';
+        statusEl.innerHTML = '<span style="background:#FEE2E2;color:#991B1B;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;">Unavailable</span>';
     }
 
     const btn = document.getElementById('modal-borrow-btn');
     if (item.available > 0) {
-        btn.href = '/login';
-        btn.style.background = '#1D9E75';
+        btn.style.background = '#7C3AED';
         btn.style.color = '#fff';
         btn.style.cursor = 'pointer';
-        btn.textContent = '🔒 Login to Borrow';
         btn.onclick = null;
+        if (isLoggedIn) {
+            btn.href = borrowBaseUrl;
+            btn.textContent = '🎸 Borrow';
+        } else {
+            btn.href = '{{ route('login') }}';
+            btn.textContent = '🔒 Login to Borrow';
+        }
     } else {
         btn.href = '#';
         btn.style.background = '#e0e0e0';

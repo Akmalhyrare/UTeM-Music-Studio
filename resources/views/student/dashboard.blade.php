@@ -4,7 +4,10 @@
 
 <style>
     .dash-header {
-        background: linear-gradient(135deg, #1a1a2e, #0f3460);
+        background-image: linear-gradient(rgba(33,28,54,0.75), rgba(33,28,54,0.75)), url("{{ asset('images/studio-control-room.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         color: #fff; padding: 36px 40px;
     }
     .dash-header h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
@@ -18,10 +21,10 @@
         display: flex; align-items: center; gap: 14px;
     }
     .stat-icon { font-size: 28px; }
-    .stat-num { font-size: 24px; font-weight: 700; color: #1a1a2e; }
+    .stat-num { font-size: 24px; font-weight: 700; color: #211C36; }
     .stat-label { font-size: 12px; color: #888; }
 
-    .section-title { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
+    .section-title { font-size: 15px; font-weight: 600; color: #211C36; margin-bottom: 14px; }
     .table-card {
         background: #fff; border-radius: 12px;
         border: 1px solid #eee; overflow: hidden;
@@ -29,17 +32,13 @@
     }
     .table-card-header {
         padding: 14px 20px; border-bottom: 1px solid #eee;
-        font-size: 14px; font-weight: 600; color: #1a1a2e;
+        font-size: 14px; font-weight: 600; color: #211C36;
         display: flex; justify-content: space-between; align-items: center;
     }
     .table-card table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .table-card th { padding: 10px 16px; text-align: left; font-size: 11px; color: #888; font-weight: 500; background: #fafafa; border-bottom: 1px solid #eee; }
     .table-card td { padding: 12px 16px; border-bottom: 1px solid #f5f5f5; color: #333; }
     .table-card tr:last-child td { border-bottom: none; }
-    .badge { padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
-    .badge-pending { background: #FAEEDA; color: #633806; }
-    .badge-approved { background: #E1F5EE; color: #085041; }
-    .badge-overdue { background: #FAECE7; color: #712B13; }
     .no-data { text-align: center; color: #888; padding: 30px; font-size: 13px; }
 
     .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
@@ -50,9 +49,9 @@
         display: flex; align-items: center; gap: 14px;
         transition: all 0.2s;
     }
-    .qa-card:hover { border-color: #1D9E75; box-shadow: 0 4px 12px rgba(29,158,117,0.1); }
+    .qa-card:hover { border-color: #7C3AED; box-shadow: 0 4px 12px rgba(124,58,237,0.1); }
     .qa-icon { font-size: 28px; }
-    .qa-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+    .qa-title { font-size: 14px; font-weight: 600; color: #211C36; }
     .qa-sub { font-size: 12px; color: #888; }
 </style>
 
@@ -109,14 +108,17 @@
     </div>
 
     {{-- MY BORROWINGS --}}
-    <div class="section-title">My Recent Borrowings</div>
+    <div class="table-card-header" style="padding:0; border:none; background:none; margin-bottom:14px;">
+        <span class="section-title" style="margin-bottom:0;">My Recent Borrowings</span>
+        <a href="{{ route('borrowings.index') }}" style="font-size:12px; color:#7C3AED; font-weight:500; text-decoration:none;">View all →</a>
+    </div>
     <div class="table-card">
         <table>
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Borrow Date</th>
-                    <th>Due Date</th>
+                    <th>Pickup Date</th>
+                    <th>Return Date</th>
                     <th>Purpose</th>
                     <th>Status</th>
                 </tr>
@@ -125,24 +127,30 @@
                 @forelse($myBorrowings as $borrow)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $borrow->borrow_date }}</td>
-                    <td>{{ $borrow->due_date }}</td>
+                    <td>{{ \Illuminate\Support\Carbon::parse($borrow->pickup_date)->format('d M Y') }}</td>
+                    <td>{{ \Illuminate\Support\Carbon::parse($borrow->return_date)->format('d M Y') }}</td>
                     <td>{{ $borrow->purpose ?? '-' }}</td>
                     <td>
-                        <span class="badge badge-{{ $borrow->borrow_status }}">
-                            {{ ucfirst($borrow->borrow_status) }}
-                        </span>
+                        <a href="{{ route('borrowings.show', $borrow->borrow_id) }}" style="text-decoration:none;">
+                            <x-status-badge :status="$borrow->borrow_status" />
+                            @if($borrow->is_overdue)
+                                <x-status-badge status="overdue" label="Overdue" />
+                            @endif
+                        </a>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="no-data">No borrowings yet. <a href="{{ route('items.browse') }}" style="color:#1D9E75;">Browse items</a></td></tr>
+                <tr><td colspan="5" class="no-data">No borrowings yet. <a href="{{ route('items.browse') }}" style="color:#7C3AED;">Browse items</a></td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
     {{-- MY BOOKINGS --}}
-    <div class="section-title">My Recent Studio Bookings</div>
+    <div class="table-card-header" style="padding:0; border:none; background:none; margin-bottom:14px;">
+        <span class="section-title" style="margin-bottom:0;">My Recent Studio Bookings</span>
+        <a href="{{ route('bookings.index') }}" style="font-size:12px; color:#7C3AED; font-weight:500; text-decoration:none;">View all →</a>
+    </div>
     <div class="table-card">
         <table>
             <thead>
@@ -158,17 +166,15 @@
                 @forelse($myBookings as $booking)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $booking->studio->studio_name ?? '-' }}</td>
+                    <td><a href="{{ route('bookings.show', $booking->booking_id) }}" style="color:#211C36; text-decoration:none;">{{ $booking->studio->studio_name ?? '-' }}</a></td>
                     <td>{{ $booking->booking_date }}</td>
                     <td>{{ $booking->start_time }} – {{ $booking->end_time }}</td>
                     <td>
-                        <span class="badge badge-{{ $booking->booking_status }}">
-                            {{ ucfirst($booking->booking_status) }}
-                        </span>
+                        <x-status-badge :status="$booking->booking_status" />
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="no-data">No bookings yet. <a href="{{ route('studios.browse') }}" style="color:#1D9E75;">Book a studio</a></td></tr>
+                <tr><td colspan="5" class="no-data">No bookings yet. <a href="{{ route('studios.browse') }}" style="color:#7C3AED;">Book a studio</a></td></tr>
                 @endforelse
             </tbody>
         </table>

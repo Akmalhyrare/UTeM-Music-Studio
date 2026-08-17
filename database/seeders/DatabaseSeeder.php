@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use Database\Seeders\Support\MalaysianData;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,11 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            CategorySeeder::class,
+            ItemSeeder::class,
+            StaffSeeder::class,
+            StudentSeeder::class,
+            StudioSeeder::class,
+            BookingSeeder::class,
+            BorrowingSeeder::class,
+            BookingHistorySeeder::class,
+            BorrowingHistorySeeder::class,
         ]);
+
+        // Write the dev-only plaintext/hash credentials reference (storage/app/private/dev-credentials.md)
+        MalaysianData::writeCredentialsLog();
     }
 }

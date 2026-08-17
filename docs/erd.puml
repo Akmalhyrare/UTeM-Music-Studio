@@ -1,0 +1,188 @@
+@startuml ERD
+
+hide circle
+skinparam linetype ortho
+
+entity "STUDENT" as student {
+  * student_id : PK
+  --
+  full_name
+  email
+  password
+  phone_no
+  matric_no
+  status
+  last_login_at
+  password_changed_at
+}
+
+entity "STAFF" as staff {
+  * staff_id : PK
+  --
+  full_name
+  email
+  password
+  phone_no
+  position
+  status
+  is_admin
+  last_login_at
+  password_changed_at
+}
+
+entity "CATEGORY" as category {
+  * category_id : PK
+  --
+  category_name
+  type
+  description
+}
+
+entity "ITEM" as item {
+  * item_id : PK
+  --
+  category_id : FK
+  item_name
+  item_description
+  image
+  quantity
+  available_quantity
+  condition_status
+  item_status
+  date_added
+}
+
+entity "ITEM_IMAGE" as item_image {
+  * image_id : PK
+  --
+  item_id : FK
+  image_path
+  position
+  is_primary
+}
+
+entity "BORROWING" as borrowing {
+  * borrow_id : PK
+  --
+  student_id : FK
+  staff_id : FK
+  collected_by : FK
+  returned_by : FK
+  pickup_date
+  return_date
+  collected_at
+  returned_at
+  borrow_status
+  purpose
+}
+
+entity "BORROWING_DETAIL" as borrowing_detail {
+  * borrow_detail_id : PK
+  --
+  borrow_id : FK
+  item_id : FK
+  quantity_borrowed
+}
+
+entity "RETURN_RECORD" as return_record {
+  * return_id : PK
+  --
+  borrow_id : FK
+  item_id : FK
+  staff_id : FK
+  return_date
+  quantity_returned
+  item_condition
+  damage_note
+  return_status
+  remarks
+}
+
+entity "MAINTENANCE" as maintenance {
+  * maintenance_id : PK
+  --
+  item_id : FK
+  staff_id : FK
+  return_id : FK
+  report_date
+  issue_type
+  description
+  maintenance_status
+}
+
+entity "STUDIO" as studio {
+  * studio_id : PK
+  --
+  studio_name
+  studio_type
+  description
+  status
+  capacity
+  equipment
+  location
+  size
+}
+
+entity "STUDIO_IMAGE" as studio_image {
+  * image_id : PK
+  --
+  studio_id : FK
+  image_path
+  position
+  is_primary
+}
+
+entity "STUDIO_UNAVAILABILITY" as studio_unavailability {
+  * unavailability_id : PK
+  --
+  studio_id : FK
+  staff_id : FK
+  type
+  start_at
+  end_at
+  reason
+}
+
+entity "BOOKING" as booking {
+  * booking_id : PK
+  --
+  student_id : FK
+  staff_id : FK
+  studio_id : FK
+  booking_date
+  start_time
+  end_time
+  booking_status
+  purpose
+}
+
+' ===== Relationships =====
+
+category   ||--o{ item                 : "belongs to"
+item       ||--o{ item_image           : "has images"
+
+student    ||--o{ borrowing            : "requests"
+staff      |o..o{ borrowing            : "approves"
+staff      |o..o{ borrowing            : "collects"
+staff      |o..o{ borrowing            : "processes return"
+
+borrowing  ||--o{ borrowing_detail     : "has details"
+item       ||--o{ borrowing_detail     : "included in"
+
+borrowing  ||--o{ return_record        : "returned via"
+item       ||--o{ return_record        : "returned via"
+staff      |o..o{ return_record        : "processes"
+
+item       ||--o{ maintenance          : "undergoes"
+staff      |o..o{ maintenance          : "handles"
+return_record |o..o{ maintenance       : "triggers"
+
+student    ||--o{ booking              : "requests"
+staff      |o..o{ booking              : "approves"
+studio     ||--o{ booking              : "reserved via"
+
+studio     ||--o{ studio_image         : "has images"
+studio     ||--o{ studio_unavailability : "has blocks"
+staff      |o..o{ studio_unavailability : "schedules"
+
+@enduml

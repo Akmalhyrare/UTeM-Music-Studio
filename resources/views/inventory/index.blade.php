@@ -22,7 +22,7 @@
 <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;">
     <div class="card border-0 shadow-sm">
         <div class="card-body d-flex align-items-center gap-3">
-            <div class="p-2 rounded" style="background:#E1F5EE;">
+            <div class="p-2 rounded" style="background:#F3E8FF;">
                 <span style="font-size:20px;">📦</span>
             </div>
             <div>
@@ -69,13 +69,13 @@
 {{-- FILTER & SEARCH --}}
 <div class="card border-0 shadow-sm mb-3">
     <div class="card-body py-2">
-        <form method="GET" action="{{ route('inventory.index') }}">
+        <form method="GET" action="{{ route('inventory.index') }}" data-instant-search>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <input type="text"
                        name="search"
                        class="form-control"
                        style="font-size:13px; max-width:250px;"
-                       placeholder="Search item name..."
+                       placeholder="Search name, brand, model, tag..."
                        value="{{ request('search') }}">
                 <select name="type" class="form-control" style="font-size:13px; max-width:160px;">
                     <option value="">All types</option>
@@ -87,7 +87,7 @@
                     <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
                     <option value="unavailable" {{ request('status') == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
                 </select>
-                <button type="submit" class="btn btn-sm" style="background:#1D9E75;color:#fff;border-radius:8px;">
+                <button type="submit" class="btn btn-sm" style="background:#7C3AED;color:#fff;border-radius:8px;">
                     🔍 Search
                 </button>
                 <a href="{{ route('inventory.index') }}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
@@ -102,6 +102,7 @@
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
         <span style="font-weight:600;">📦 Inventory Items</span>
+        <span class="text-muted" style="font-size:12px;">{{ $items->total() }} item(s)</span>
         <div style="display:flex; gap:8px;">
             <a href="{{ route('inventory.categories') }}"
                class="btn btn-sm btn-outline-secondary"
@@ -110,7 +111,7 @@
             </a>
             <a href="{{ route('inventory.create') }}"
                class="btn btn-sm"
-               style="background:#1D9E75;color:#fff;border-radius:8px; font-size:13px;">
+               style="background:#7C3AED;color:#fff;border-radius:8px; font-size:13px;">
                 + Add Item
             </a>
         </div>
@@ -173,18 +174,18 @@
                     </td>
                     <td>
                         @if($item->condition_status == 'good')
-                            <span class="badge" style="background:#E1F5EE;color:#085041;">Good</span>
+                            <span class="badge" style="background:#D1FAE5;color:#065F46;">Good</span>
                         @elseif($item->condition_status == 'fair')
                             <span class="badge" style="background:#FAEEDA;color:#633806;">Fair</span>
                         @else
-                            <span class="badge" style="background:#FAECE7;color:#712B13;">Poor</span>
+                            <span class="badge" style="background:#FEE2E2;color:#991B1B;">Poor</span>
                         @endif
                     </td>
                     <td>
                         @if($item->item_status == 'available')
-                            <span class="badge" style="background:#E1F5EE;color:#085041;">Available</span>
+                            <span class="badge" style="background:#D1FAE5;color:#065F46;">Available</span>
                         @else
-                            <span class="badge" style="background:#FAECE7;color:#712B13;">Unavailable</span>
+                            <span class="badge" style="background:#FEE2E2;color:#991B1B;">Unavailable</span>
                         @endif
                     </td>
                     <td>
@@ -210,6 +211,11 @@
             </tbody>
         </table>
     </div>
+    @if($items->hasPages())
+        <div class="card-footer bg-white">
+            {{ $items->links('pagination::bootstrap-5') }}
+        </div>
+    @endif
 </div>
 
 <style>
